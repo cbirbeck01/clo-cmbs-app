@@ -278,7 +278,7 @@ def run_clo_model():
             margin=dict(t=50, l=80, r=80, b=120),
             autosize=True,
             height=750,
-            width=2000,
+            width=1700,
             transition_duration=500
         )
         # Recreate IRR table for CSV download

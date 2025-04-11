@@ -165,8 +165,8 @@ def run_clo_model():
         fig.add_annotation(x=0.075, y=(y_base - bar_gap) / 2, text=f"<b>Loan Pool</b><br>${total_collateral:,.0f}", showarrow=False, font=dict(size=13, color="black"), align="center")
 
         fig.update_layout(
-            height=650,
-            width=500,
+            height=750,
+            width=1000,
             margin=dict(t=50, b=50, l=40, r=40),
             xaxis=dict(range=[0, 1], visible=False),
             yaxis=dict(range=[0, y_base + 1], visible=False),

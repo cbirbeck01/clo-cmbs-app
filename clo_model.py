@@ -8,8 +8,8 @@ def run_clo_model():
     st.title("CLO Waterfall")
 
     if st.button("Back to Home"):
-    st.experimental_set_query_params(view="home")
-    
+        st.query_params["view"] = "home"
+
     with st.sidebar:
         st.header("Tranche Inputs")
         total_collateral = st.number_input("Total Collateral ($)", value=110_000_000, step=1_000_000)

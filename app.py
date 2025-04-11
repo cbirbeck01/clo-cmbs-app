@@ -8,7 +8,7 @@ st.title("Asset Backed Securities Dashboard")
 
 st.markdown("### Choose security to begin:")
 
-app_choice: st.selectbox("Select Application:", ["-", "CLO", "CMBS"])
+app_choice=st.selectbox("Select Application:", ["CLO", "CMBS"])
 if app_choice == "CLO":
     run_clo_model()
 

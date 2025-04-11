@@ -3,8 +3,8 @@ from clo_model import run_clo_model
 from cmbs_model import run_cmbs_model
 
 st.set_page_config(page_title="Structured Products Explorer", layout="centered")
-query_params=st.experimental_get_query_params()
-view=query_params.get("view", ["home"])[0]
+query_params = st.query_params
+view = query_params.get("view", "home")
 if view == "home":
     st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
     st.title("📊 Structured Products Explorer")

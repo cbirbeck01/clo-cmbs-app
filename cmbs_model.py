@@ -3,6 +3,7 @@ import plotly.graph_objects as go
 import numpy_financial as npf
 
 def run_cmbs_model():
+    st.set_page_config(layout="wide")
     with st.container():
         st.title("CMBS Cash Flow Model")
 

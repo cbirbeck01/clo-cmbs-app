@@ -172,7 +172,7 @@ def run_clo_model():
             xaxis=dict(range=[0, 1], visible=False),
             yaxis=dict(range=[0, y_base + 1], visible=False),
             title="CLO Tranche Fill Funnel",
-            plot_bgcolor="white",
+            plot_bgcolor="yellow",
         )
 
         left_spacer, center_col, right_spacer = st.columns([0.1, 0.8, 0.1])

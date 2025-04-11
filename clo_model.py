@@ -165,20 +165,42 @@ def run_clo_model():
         fig.add_annotation(x=0.075, y=(y_base - bar_gap) / 2, text=f"<b>Loan Pool</b><br>${total_collateral:,.0f}", showarrow=False, font=dict(size=13, color="black"), align="center")
 
         fig.update_layout(
-            width=1200,
-            autosize=False,
-            height=750,
-            margin=dict(t=50, b=40, l=40, r=50),
-            xaxis=dict(range=[0, 1], visible=False),
-            yaxis=dict(range=[0, y_base + 1], visible=False),
-            title="CLO Tranche Fill Funnel",
-            plot_bgcolor="yellow",
-        )
+                autosize=True,
+                height=750,
+                margin=dict(t=50, l=40, r=40, b=50),
+                xaxis=dict(range=[0, 1], visible=False),
+                yaxis=dict(range=[0, y_base + 1], visible=False),
+                title="CLO Tranche Fill Funnel",
+                plot_bgcolor="white"
+            )
+        
 
         left_spacer, center_col, right_spacer = st.columns([0.1, 0.8, 0.1])
 
-        with center_col:
-            st.plotly_chart(fig, use_container_width=False)
+        with st.container():
+            st.markdown(
+                """
+                <style>
+                .full-width-chart .js-plotly-plot {
+                    width: 100% !important;
+                    max-width: 1400px;
+                    margin: auto;
+                }
+                </style>
+                """,
+                unsafe_allow_html=True,
+            )
+
+            chart_html_id = "full-width-chart"
+
+            # Start custom wrapper
+            st.markdown(f'<div class="{chart_html_id}">', unsafe_allow_html=True)
+
+            # Render the chart using container width
+            st.plotly_chart(fig, use_container_width=True)
+
+            # Close the wrapper
+            st.markdown("</div>", unsafe_allow_html=True)
 
         # IRR Calculations
         senior_cf = [-senior_size] + [senior_paid / years] * (years - 1) + [senior_paid / years + senior_size]

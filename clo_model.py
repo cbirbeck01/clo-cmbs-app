@@ -165,8 +165,9 @@ def run_clo_model():
         fig.add_annotation(x=0.075, y=(y_base - bar_gap) / 2, text=f"<b>Loan Pool</b><br>${total_collateral:,.0f}", showarrow=False, font=dict(size=13, color="black"), align="center")
 
         fig.update_layout(
+            width=None,
+            autosize=True,
             height=750,
-            width=1000,
             margin=dict(t=50, b=50, l=40, r=40),
             xaxis=dict(range=[0, 1], visible=False),
             yaxis=dict(range=[0, y_base + 1], visible=False),
@@ -174,7 +175,10 @@ def run_clo_model():
             plot_bgcolor="white",
         )
 
-        st.plotly_chart(fig, use_container_width=True)
+        left_spacer, center_col, right_spacer = st.columns([0.1, 0.8, 0.1])
+
+        with center_col:
+            st.plotly_chart(fig, use_container_width=True)
 
         # IRR Calculations
         senior_cf = [-senior_size] + [senior_paid / years] * (years - 1) + [senior_paid / years + senior_size]

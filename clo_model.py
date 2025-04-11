@@ -174,7 +174,7 @@ def run_clo_model():
                 title="CLO Tranche Fill Funnel",
                 plot_bgcolor="white"
             )
-        
+
 
         left_spacer, center_col, right_spacer = st.columns([0.1, 0.8, 0.1])
 

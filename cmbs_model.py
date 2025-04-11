@@ -7,8 +7,8 @@ def run_cmbs_model():
         st.title("CMBS Cash Flow Model")
 
         if st.button("Back to Home"):
-        st.experimental_set_query_params(view="home")
-        
+            st.query_params["view"] = "home"
+
         with st.sidebar:
             st.header("CMBS Deal Inputs")
 

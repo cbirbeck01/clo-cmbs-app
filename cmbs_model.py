@@ -126,6 +126,7 @@ def run_cmbs_model():
             yaxis_title="Amount ($)",
             font=dict(family="Helvetica", size=14, color="black"),
             height=500,
+            width=1000,
             plot_bgcolor="white"
         )
 

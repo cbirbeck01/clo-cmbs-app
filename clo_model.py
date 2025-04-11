@@ -5,7 +5,7 @@ import pandas as pd
 
 
 def run_clo_model():
-    st.set_page_config(layout="wide")
+
     st.title("CLO Waterfall")
 
     if st.button("Back to Home"):

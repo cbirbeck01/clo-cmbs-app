@@ -172,7 +172,7 @@ def run_clo_model():
                 xaxis=dict(range=[0, 1], visible=False),
                 yaxis=dict(range=[0, y_base + 1], visible=False),
                 title="CLO Tranche Fill Funnel",
-                plot_bgcolor="white"
+                plot_bgcolor="rgba(0,0,0,0)"
             )
 
 

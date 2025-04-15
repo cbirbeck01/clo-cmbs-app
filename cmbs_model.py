@@ -96,11 +96,11 @@ def run_cmbs_model():
     ))
 
     fig.update_layout(
-        title="CMBS Tranche Waterfall Distribution",
+        title="CMBS Waterfall Structure",
         title_font_size=22,
         xaxis_title="Cash Flow Step",
         yaxis_title="Amount ($)",
-        font=dict(family="Helvetica", size=18, color="black"),
+        font=dict(family="Helvetica", size=22, color="black"),
         height=500,
         plot_bgcolor="rgba(0,0,0,0)"
     )

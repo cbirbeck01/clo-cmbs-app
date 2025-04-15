@@ -18,10 +18,6 @@ def run_clo_model():
 
     st.title("CLO Waterfall")
 
-    st.markdown("""
-    > Note: This model assumes a simplified CLO structure beginning at the start of amortization. It shows monthly interest and principal allocations to tranches under flat assumptions for defaults, recoveries, and yield.
-    """, unsafe_allow_html=True)
-
     
     if st.button("Back to Home"):
         st.query_params["view"] = "home"

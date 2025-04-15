@@ -16,10 +16,12 @@ if view=="home":
     with col1:
         if st.button("CLO"):
             st.query_params["view"] = "clo"
+            st.rerun()
 
     with col2:
         if st.button("CMBS"):
             st.query_params["view"] = "cmbs"
+            st.rerun()
 
 elif view=="clo":
     run_clo_model()

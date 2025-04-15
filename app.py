@@ -3,6 +3,25 @@ from clo_model import run_clo_model
 from cmbs_model import run_cmbs_model
 
 
+st.markdown("""
+<style>
+div.stButton > button {
+    background-color:#03893e;
+    color:white;
+    padding:0.75em 2em;
+    font-size:1.1em;
+    font-weight:600;
+    border-radius:10px;
+    border:none;
+    transition:background-color 0.3s ease;
+}
+div.stButton > button:hover {
+    background-color:#026c32;
+}
+</style>
+""", unsafe_allow_html=True)
+
+
 st.set_page_config(page_title="Asset Backed Securities Visualizer", layout="wide")
 
 view = st.query_params.get("view", "home")

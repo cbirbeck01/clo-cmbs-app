@@ -319,10 +319,10 @@ def run_clo_model():
 
         hover_text = [
             f"Available Cash: ${available_cash:,.0f}",
-            f"Senior Total: ${senior_paid:,.0f} of ${senior_interest:,.0f} {senior_flag}"
-            + (f" ({(senior_paid / senior_paid * 100):.1f}%)" if show_percentage else ""),
-            f"Mezzanine Total: ${mezz_paid:,.0f} of ${mezz_interest:,.0f} {mezz_flag}"
-            + (f" ({(mezz_paid / mezz_paid * 100):.1f}%)" if show_percentage else ""),
+            f"Senior Total: ${senior_paid:,.0f} of ${expected_senior_total:,.0f} {senior_flag}"
+            + (f" ({(senior_paid / expected_senior_total * 100):.1f}%)" if show_percentage else ""),
+            f"Mezzanine Total: ${mezz_paid:,.0f} of ${expected_mezz_total:,.0f} {mezz_flag}"
+            + (f" ({(mezz_paid / expected_mezz_total * 100):.1f}%)" if show_percentage else ""),
             f"Equity Residual: ${equity_paid:,.0f} {equity_flag}"
         ]
 

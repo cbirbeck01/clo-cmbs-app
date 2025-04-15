@@ -62,43 +62,7 @@ def run_clo_model():
         mezz_rate = st.number_input("Mezz Coupon (%)", 1.0, 15.0, 8.0, step=0.5)
         years = st.number_input("Years", 1, 10, 5)
 
-        show_advanced = st.checkbox("Advanced Options")
 
-        if show_advanced:
-            st.markdown("### Loan Pool Characteristics")
-            st.markdown("**Senior Loan Characteristics**")
-            senior_coupon = st.slider("Senior Avg Coupon (%)", 2.0, 10.0, 4.5, step=0.5)
-            senior_default = st.slider("Senior Default Rate (%)", 0.0, 20.0, 5.0, step=0.1)
-            senior_yield = st.slider("Senior Recovery Rate (%)", 0.0, 100.0, 45.0, step=0.5)
-
-            st.markdown("**Mezzanine Loan Characteristics**")
-            mezz_coupon = st.slider("Mezzanine Avg Coupon (%)", 5.0, 12.0, 7.5, step=0.5)
-            mezz_default = st.slider("Mezzanine Default Rate (%)", 0.0, 40.0, 15.0, step=0.1)
-            mezz_recovery = st.slider("Mezzanine Recovery Rate (%)", 0.0, 100.0, 30.0, step=0.5)
-
-            st.markdown("**Equity Assumptions (Residual)**")
-            equity_yield = st.slider("Equity Target Yield (%)", 0.0, 25.0, 12.0, step=0.1)
-
-        st.markdown("---")
-        show_stats = st.checkbox("Add Collateral Pool Characteristics (Optional)")
-
-        if show_stats:
-            st.markdown("### Collateral Quality Metrics")
-            was = st.slider("Weighted Avg Spread (bps)", 250, 600, 375)
-            avg_ltv = st.slider("Avg LTV (%)", 50, 100, 70)
-            avg_dscr = st.slider("Avg DSCR", 0.5, 3.0, 1.5)
-
-            if avg_ltv <= 60:
-                default_rate = max(default_rate - 2, 0)
-            elif avg_ltv > 80:
-                default_rate += 3
-
-            if avg_dscr >= 1.5:
-                recovery_rate = min(recovery_rate + 3, 100)
-            elif avg_dscr < 1.2:
-                recovery_rate = max(recovery_rate - 4, 0)
-
-            collateral_yield = round(5 + was / 10000, 2)
 
     int_income = total_collateral * (collateral_yield / 100) * years
     default_loss = total_collateral * (default_rate / 100)

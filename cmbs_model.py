@@ -1,6 +1,8 @@
 import streamlit as st
 import plotly.graph_objects as go
 import numpy_financial as npf
+from cmbs_periodic_cashflow import simulate_cmbs_cashflows
+
 
 def run_cmbs_model():
 
@@ -9,6 +11,7 @@ def run_cmbs_model():
 
         if st.button("Back to Home"):
             st.query_params["view"] = "home"
+            st.rerun()
 
         with st.sidebar:
             st.header("CMBS Deal Inputs")
@@ -66,21 +69,24 @@ def run_cmbs_model():
                 if multifamily_pct> 50:
                     loss_severity=max(loss_severity - 3, 0)
 
-        #cash flow calcs
-        senior_interest = senior_size * (senior_coupon / 100) * years
-        mezz_interest = mezz_size * (mezz_coupon / 100) * years
-        principal_repayment = senior_size + mezz_size
-        noi = total_loan_pool * (noi_yield / 100) * years
-        expected_loss = total_loan_pool * (default_rate / 100) * (loss_severity / 100)
-        net_cash = noi - expected_loss
-        remaining_cash = net_cash
-        senior_paid = min(senior_interest, remaining_cash)
-        remaining_cash -= senior_paid
-        mezz_paid = min(mezz_interest, remaining_cash)
-        remaining_cash -= mezz_paid
-        principal_paid = min(principal_repayment, remaining_cash)
-        remaining_cash -= principal_paid
-        equity_paid = max(remaining_cash, 0)
+
+        df, sr_irr, mz_irr, eq_irr = simulate_cmbs_cashflows(
+            total_loan_pool,
+            senior_size,
+            mezz_size,
+            equity_size,
+            senior_coupon,
+            mezz_coupon,
+            default_rate,
+            loss_severity,
+            noi_yield,
+            years
+        )
+
+        senior_paid = df["Senior Interest"].sum() + df["Senior Principal"].sum()
+        mezz_paid = df["Mezz Interest"].sum() + df["Mezz Principal"].sum()
+        principal_paid = df["Senior Principal"].sum() + df["Mezz Principal"].sum()
+        equity_paid = df["Equity Cash"].sum()
 
         def to_millions(value):
             return f"${value / 1_000_000:.2f}M"
@@ -97,19 +103,19 @@ def run_cmbs_model():
                 "Equity Residual"
             ],
             y=[
-                net_cash,
+                senior_paid + mezz_paid + principal_paid + equity_paid,
                 -senior_paid,
                 -mezz_paid,
                 -principal_paid,
                 equity_paid
             ],
-            text=[
-                to_millions(net_cash),
-                to_millions(senior_paid),
-                to_millions(mezz_paid),
-                to_millions(principal_paid),
-                to_millions(equity_paid)
-            ],
+            text = [
+            to_millions(senior_paid + mezz_paid + principal_paid + equity_paid),
+            to_millions(senior_paid),
+            to_millions(mezz_paid),
+            to_millions(principal_paid),
+            to_millions(equity_paid)
+        ],
             textposition="inside",
             insidetextanchor="middle",
             hoverinfo="x+text",
@@ -139,9 +145,12 @@ def run_cmbs_model():
         st.write(f"Equity Residual: {to_millions(equity_paid)}")
 
         st.subheader("Cash Flow Summary")
-        st.write(f"**Total NOI** over {years} years: {to_millions(noi)}")
-        st.write(f"**Expected Loss:** {to_millions(expected_loss)}")
-        st.write(f"**Net Cash:** {to_millions(net_cash)}")
+
+        expected_loss = total_loan_pool * (default_rate / 100) * (loss_severity / 100)
+        net_cash = senior_paid + mezz_paid + principal_paid + equity_paid
+
+        st.write(f"**Expected Loss (Modeled):** {to_millions(expected_loss)}")
+        st.write(f"**Net Cash (Distributed):** {to_millions(net_cash)}")
 
         import pandas as pd
 
@@ -163,18 +172,13 @@ def run_cmbs_model():
         st.dataframe(cf_table, use_container_width=True)
 
         #IRR calcs
-        senior_cf = [-senior_size] + [senior_paid / years] * (years - 1) + [senior_paid / years + senior_size]
-        mezz_cf = [-mezz_size] + [mezz_paid / years] * (years - 1) + [mezz_paid / years + mezz_size]
-        equity_cf = [-equity_size] + [equity_paid / years] * years
-
-        senior_irr = npf.irr(senior_cf) * 100
-        mezz_irr = npf.irr(mezz_cf) * 100
-        equity_irr = npf.irr(equity_cf) * 100
-
         st.subheader("Estimated IRRs")
-        st.write(f"Senior IRR: {senior_irr:.2f}%")
-        st.write(f"Mezzanine IRR: {mezz_irr:.2f}%")
-        st.write(f"Equity IRR: {equity_irr:.2f}%")
+        st.write(f"Senior IRR: {sr_irr:.2f}%")
+        st.write(f"Mezzanine IRR: {mz_irr:.2f}%")
+        st.write(f"Equity IRR: {eq_irr:.2f}%")
+
+        st.subheader("Monthly Cashflows")
+        st.dataframe(df, use_container_width=True)
 
         if show_advanced:
             st.subheader("Mortgage Characteristics")

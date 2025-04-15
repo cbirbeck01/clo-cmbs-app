@@ -26,7 +26,7 @@ div.stButton > button:hover {
 view = st.query_params.get("view", "home")
 
 if view=="home":
-    st.set_page_config(page_title="Asset Backed Securities Visualizer", layout="wide")
+
 
 
     with st.container():

@@ -87,6 +87,7 @@ def run_cmbs_model():
         ],
         textposition="inside",
         insidetextanchor="middle",
+        insidetextfont=dict(color="white", size=18, family="Helvetica")
         hoverinfo="x+text",
         increasing={"marker": {"color": "#1ab413"}},
         decreasing={"marker": {"color": "#3a9bc0"}},
@@ -99,7 +100,7 @@ def run_cmbs_model():
         title_font_size=22,
         xaxis_title="Cash Flow Step",
         yaxis_title="Amount ($)",
-        font=dict(family="Helvetica", size=14, color="black"),
+        font=dict(family="Helvetica", size=18, color="black"),
         height=500,
         plot_bgcolor="rgba(0,0,0,0)"
     )

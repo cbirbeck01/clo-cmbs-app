@@ -371,17 +371,30 @@ def run_clo_model():
         col2.metric("Mezzanine IRR",f"{mezz_irr:.2f}%")
         col3.metric("Equity IRR",f"{equity_irr:.2f}%")
 
-        # Tranche Summary
+
+
+        # Tranche Summary Breakdown
+        senior_interest_paid=df["Senior Interest"].sum()
+        senior_principal_paid=df["Senior Principal"].sum()
+        mezz_interest_paid=df["Mezzanine Interest"].sum() if "Mezzanine Interest" in df.columns else df["Mezz Interest"].sum()
+        mezz_principal_paid=df["Mezz Principal"].sum()
+        equity_paid=df["Equity Cash"].sum()
+
+        expected_loss=total_collateral*(default_rate/100)*(1-recovery_rate/100)
+        net_cash=senior_interest_paid+senior_principal_paid+mezz_interest_paid+mezz_principal_paid+equity_paid
+
         st.subheader("Tranche Summary")
-        col4,col5=st.columns(2)
-        with col4:
-            st.metric("Senior Paid",f"${senior_paid/1_000_000:.2f}M")
-            st.metric("Mezzanine Paid",f"${mezz_paid/1_000_000:.2f}M")
-            st.metric("Principal Paid",f"${principal_paid/1_000_000:.2f}M")
-        with col5:
+        col1,col2=st.columns(2)
+        with col1:
+            st.metric("Senior Interest",f"${senior_interest_paid/1_000_000:.2f}M")
+            st.metric("Senior Principal",f"${senior_principal_paid/1_000_000:.2f}M")
+            st.metric("Mezzanine Interest",f"${mezz_interest_paid/1_000_000:.2f}M")
+            st.metric("Mezzanine Principal",f"${mezz_principal_paid/1_000_000:.2f}M")
+        with col2:
             st.metric("Equity Residual",f"${equity_paid/1_000_000:.2f}M")
             st.metric("Expected Loss",f"${expected_loss/1_000_000:.2f}M")
             st.metric("Net Cash Distributed",f"${net_cash/1_000_000:.2f}M")
+
 
         # Annual Summary
         st.subheader("Annual Cash Flow Summary")

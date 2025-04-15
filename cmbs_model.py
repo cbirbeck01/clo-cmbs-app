@@ -67,6 +67,10 @@ def run_cmbs_model():
     net_cash = senior_paid + mezz_paid + equity_paid
     expected_loss = total_loan_pool * (default_rate / 100) * (loss_severity / 100)
 
+
+    expected_senior_total=senior_size*(senior_coupon/100)*years+(senior_size/years)*years
+    expected_mezz_total=mezz_size*(mezz_coupon/100)*years+(mezz_size/years)*years
+
     def to_millions(value):
         return f"${value / 1_000_000:.2f}M"
 
@@ -78,10 +82,10 @@ def run_cmbs_model():
         y=[net_cash, -senior_paid, -mezz_paid, equity_paid if equity_paid > 0 else -1_000_000],
         text=[
             to_millions(net_cash),
-            to_millions(senior_paid),
-            to_millions(mezz_paid),
+            to_millions(senior_paid)+(f" ({(senior_paid/expected_senior_total*100):.1f}%)"),
+            to_millions(mezz_paid)+(f" ({(mezz_paid/expected_mezz_total*100):.1f}%)"),
             to_millions(equity_paid)
-        ],
+            ],
         textposition="inside",
         insidetextanchor="middle",
         hoverinfo="x+text",

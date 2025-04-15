@@ -41,12 +41,12 @@ if view=="home":
             col1, col2 = st.columns(2)
 
             with col1:
-                if st.button("🚀 CLO Waterfall"):
+                if st.button("CLO"):
                     st.query_params["view"]="clo"
                     st.rerun()
 
             with col2:
-                if st.button("🏢 CMBS Model"):
+                if st.button("CMBS"):
                     st.query_params["view"]="cmbs"
                     st.rerun()
 

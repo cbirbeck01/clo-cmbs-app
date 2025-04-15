@@ -268,6 +268,9 @@ def run_clo_model():
         mezz_flag = status_flag(mezz_paid, mezz_interest)
         principal_flag = status_flag(principal_paid, principal_repayment)
         equity_flag = status_flag(equity_paid, 0.01)
+        expected_senior_total=senior_interest+principal_repayment*(senior_size/(senior_size+mezz_size))
+        expected_mezz_total=mezz_interest+principal_repayment*(mezz_size/(senior_size+mezz_size))
+
 
         x_labels = [
         "Available Cash",
@@ -291,12 +294,13 @@ def run_clo_model():
         def format_millions(value):
             return f"{value / 1_000_000:.1f}M"
 
-        text_labels = [
+        text_labels=[
         format_millions(available_cash),
-        format_millions(senior_paid),
-        format_millions(mezz_paid),
+        format_millions(senior_paid)+(f" ({(senior_paid/expected_senior_total*100):.1f}%)" if show_percentage else ""),
+        format_millions(mezz_paid)+(f" ({(mezz_paid/expected_mezz_total*100):.1f}%)" if show_percentage else ""),
         format_millions(equity_paid)
         ]
+
 
 
         hover_text = [
@@ -357,15 +361,35 @@ def run_clo_model():
         mezz_irr = npf.irr(mezz_cf) * 100
         equity_irr = npf.irr(equity_cf) * 100
         st.plotly_chart(fig)
-        irr_df = pd.DataFrame({
-            "Tranche": ["Senior", "Mezzanine", "Equity"],
-            "Initial Investment": [senior_size, mezz_size, equity_size],
-            "Total Paid": [senior_paid + senior_size, mezz_paid + mezz_size, equity_paid],
-            "IRR (%)": [f"{senior_irr:.2f}", f"{mezz_irr:.2f}", f"{equity_irr:.2f}"]
-        })
-        st.subheader("Tranche IRR Summary Table")
-        st.dataframe(irr_df, use_container_width=True)
+        # IRR Summary
+        st.subheader("Tranche IRRs")
+        col1,col2,col3=st.columns(3)
+        col1.metric("Senior IRR",f"{senior_irr:.2f}%")
+        col2.metric("Mezzanine IRR",f"{mezz_irr:.2f}%")
+        col3.metric("Equity IRR",f"{equity_irr:.2f}%")
 
+        # Tranche Summary
+        st.subheader("Tranche Summary")
+        col4,col5=st.columns(2)
+        with col4:
+            st.metric("Senior Paid",f"${senior_paid/1_000_000:.2f}M")
+            st.metric("Mezzanine Paid",f"${mezz_paid/1_000_000:.2f}M")
+            st.metric("Principal Paid",f"${principal_paid/1_000_000:.2f}M")
+        with col5:
+            st.metric("Equity Residual",f"${equity_paid/1_000_000:.2f}M")
+            st.metric("Expected Loss",f"${expected_loss/1_000_000:.2f}M")
+            st.metric("Net Cash Distributed",f"${net_cash/1_000_000:.2f}M")
+
+        # Annual Summary
+        st.subheader("Annual Cash Flow Summary")
+        annual_df=create_clo_annual_cashflow_summary(df,years)
+        for col in ["Senior Cash Flow","Mezzanine Cash Flow","Equity Cash Flow"]:
+            annual_df[col]=annual_df[col].apply(lambda x:f"${x/1_000_000:.2f}M")
+        st.dataframe(annual_df,use_container_width=True)
+
+        # Monthly Cashflows
+        st.subheader("Monthly Cashflows")
+        st.dataframe(df,use_container_width=True)
 
 
         import io
@@ -376,7 +400,7 @@ def run_clo_model():
             writer.close()
 
         st.download_button(
-            label="📥 Download IRR Table as Excel",
+            label="Download IRR Table as Excel",
             data=output.getvalue(),
             file_name="clo_tranche_irr_summary.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"

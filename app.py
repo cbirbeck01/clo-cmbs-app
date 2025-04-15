@@ -26,26 +26,30 @@ div.stButton > button:hover {
 view = st.query_params.get("view", "home")
 
 if view=="home":
-    st.title("Asset Backed Securities Visualizer")
+    st.set_page_config(page_title="Asset Backed Securities Visualizer", layout="wide")
 
 
-    st.markdown("<div style='height:25vh;'></div>", unsafe_allow_html=True)
+    with st.container():
+        st.markdown("<div style='height:25vh;'></div>", unsafe_allow_html=True)
 
-    #horizontal spacing
-    spacer1, center_col, spacer2 = st.columns([1, 2, 1])
-    with center_col:
-        st.markdown("### Select a product type to begin:")
-        col1, col2 = st.columns(2)
+        st.markdown("<h1 style='text-align: center;'>Asset Backed Securities Visualizer</h1>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center; font-size: 1.2em;'>Select a product type to begin:</p>", unsafe_allow_html=True)
 
-        with col1:
-            if st.button("🚀 CLO Waterfall"):
-                st.query_params["view"]="clo"
-                st.rerun()
 
-        with col2:
-            if st.button("🏢 CMBS Model"):
-                st.query_params["view"]="cmbs"
-                st.rerun()
+        spacer1, center_col, spacer2 = st.columns([1, 2, 1])
+        with center_col:
+            col1, col2 = st.columns(2)
+
+            with col1:
+                if st.button("🚀 CLO Waterfall"):
+                    st.query_params["view"]="clo"
+                    st.rerun()
+
+            with col2:
+                if st.button("🏢 CMBS Model"):
+                    st.query_params["view"]="cmbs"
+                    st.rerun()
+
 
 elif view=="clo":
     run_clo_model()

@@ -67,43 +67,39 @@ def run_cmbs_model():
     net_cash = senior_paid + mezz_paid + equity_paid
     expected_loss = total_loan_pool * (default_rate / 100) * (loss_severity / 100)
 
-
-    expected_senior_total=senior_size*(senior_coupon/100)*years+(senior_size/years)*years
-    expected_mezz_total=mezz_size*(mezz_coupon/100)*years+(mezz_size/years)*years
-
     def to_millions(value):
         return f"${value / 1_000_000:.2f}M"
-        
-fig = go.Figure(go.Waterfall(
-    name="CMBS Waterfall",
-    orientation="v",
-    measure=["relative", "relative", "relative", "relative"],
-    x=["Available Cash", "Senior", "Mezzanine", "Equity"],
-    y=[net_cash, -senior_paid, -mezz_paid, equity_paid if equity_paid > 0 else -1_000_000],
-    text=[
-        to_millions(net_cash),
-        to_millions(senior_paid),
-        to_millions(mezz_paid),
-        to_millions(equity_paid)
-    ],
-    textposition="inside",
-    insidetextanchor="middle",
-    hoverinfo="x+text",
-    increasing={"marker": {"color": "#2d6cd2"}},
-    decreasing={"marker": {"color": "#cc0000"}},
-    totals={"marker": {"color": "#27a119"}},
-    opacity=0.85
-))
-fig.update_layout(
-    title="CMBS Tranche Waterfall Distribution",
-    title_font_size=22,
-    xaxis_title="Cash Flow Step",
-    yaxis_title="Amount ($)",
-    font=dict(family="Helvetica", size=14, color="black"),
-    height=500,
-    plot_bgcolor="rgba(0,0,0,0)"
-)
 
+    fig = go.Figure(go.Waterfall(
+        name="CMBS Waterfall",
+        orientation="v",
+        measure=["relative", "relative", "relative", "relative"],
+        x=["Available Cash", "Senior", "Mezzanine", "Equity"],
+        y=[net_cash, -senior_paid, -mezz_paid, equity_paid if equity_paid > 0 else -1_000_000],
+        text=[
+            to_millions(net_cash),
+            to_millions(senior_paid),
+            to_millions(mezz_paid),
+            to_millions(equity_paid)
+        ],
+        textposition="inside",
+        insidetextanchor="middle",
+        hoverinfo="x+text",
+        increasing={"marker": {"color": "#2d6cd2"}},
+        decreasing={"marker": {"color": "#cc0000"}},
+        totals={"marker": {"color": "#27a119"}},
+        opacity=0.85
+    ))
+
+    fig.update_layout(
+        title="CMBS Tranche Waterfall Distribution",
+        title_font_size=22,
+        xaxis_title="Cash Flow Step",
+        yaxis_title="Amount ($)",
+        font=dict(family="Helvetica", size=14, color="black"),
+        height=500,
+        plot_bgcolor="rgba(0,0,0,0)"
+    )
 
     st.plotly_chart(fig, use_container_width=True)
 

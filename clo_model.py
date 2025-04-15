@@ -117,8 +117,8 @@ def run_clo_model():
 
     # Use cumulative results for visuals
     senior_paid = df["Senior Interest"].sum() + df["Senior Principal"].sum()
-    mezz_paid = df["Mezz Interest"].sum() + df["Mezz Principal"].sum()
-    principal_paid = df["Senior Principal"].sum() + df["Mezz Principal"].sum()
+    mezz_paid = df["Junior Interest"].sum() + df["Junior Principal"].sum()
+    principal_paid = df["Senior Principal"].sum() + df["Junior Principal"].sum()
     equity_paid = df["Equity Cash"].sum()
 
     chart_view = st.selectbox("Select Chart View", ["Tranche View", "Waterfall View"], index=0)

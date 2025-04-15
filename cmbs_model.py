@@ -146,19 +146,20 @@ def run_cmbs_model():
 
         st.plotly_chart(fig, use_container_width=True)
 
-        st.subheader("Tranche Cash Flow Summary")
-        st.write(f"Senior Paid: {to_millions(senior_paid)}")
-        st.write(f"Mezzanine Paid: {to_millions(mezz_paid)}")
-        st.write(f"Principal Paid: {to_millions(principal_paid)}")
-        st.write(f"Equity Residual: {to_millions(equity_paid)}")
-
-        st.subheader("Cash Flow Summary")
-
         expected_loss = total_loan_pool * (default_rate / 100) * (loss_severity / 100)
         net_cash = senior_paid + mezz_paid + principal_paid + equity_paid
 
-        st.write(f"**Expected Loss (Modeled):** {to_millions(expected_loss)}")
-        st.write(f"**Net Cash (Distributed):** {to_millions(net_cash)}")
+        st.subheader("Tranche Summary")
+
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Senior Paid", to_millions(senior_paid))
+            st.metric("Mezzanine Paid", to_millions(mezz_paid))
+            st.metric("Principal Paid", to_millions(principal_paid))
+        with col2:
+            st.metric("Equity Residual", to_millions(equity_paid))
+            st.metric("Expected Loss", to_millions(expected_loss))
+            st.metric("Net Cash Distributed", to_millions(net_cash))
 
         import pandas as pd
 
@@ -167,16 +168,17 @@ def run_cmbs_model():
         cf_table["Mezzanine Cash Flow"] = cf_table["Mezzanine Cash Flow"].apply(to_millions)
         cf_table["Equity Cash Flow"] = cf_table["Equity Cash Flow"].apply(to_millions)
 
-        st.subheader("Investor Payment Schedule")
+        st.subheader("Annual Cash Flow Summary")
         st.dataframe(cf_table, use_container_width=True)
 
-        #IRR calcs
-        st.subheader("Estimated IRRs")
-        st.write(f"Senior IRR: {sr_irr:.2f}%")
-        st.write(f"Mezzanine IRR: {mz_irr:.2f}%")
-        st.write(f"Equity IRR: {eq_irr:.2f}%")
+        st.subheader("Tranche IRRs")
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Senior IRR", f"{sr_irr:.2f}%")
+        col2.metric("Mezzanine IRR", f"{mz_irr:.2f}%")
+        col3.metric("Equity IRR", f"{eq_irr:.2f}%" if not pd.isna(eq_irr) else "n/a")
 
         st.subheader("Monthly Cashflows")
+        df.rename(columns={"Mezz Interest": "Mezzanine Interest"}, inplace=True)
         st.dataframe(df, use_container_width=True)
 
         if show_advanced:

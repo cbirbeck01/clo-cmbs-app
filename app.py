@@ -33,14 +33,16 @@ if view=="home":
         st.markdown("<div style='height:25vh;'></div>", unsafe_allow_html=True)
         st.markdown("<h1 style='text-align: center;'>Asset Backed Securities Visualizer</h1>", unsafe_allow_html=True)
         st.markdown("<p style='text-align: center; font-size: 1.2em;'>Select a product type to begin:</p>", unsafe_allow_html=True)
-        spacer1, center_col, spacer2 = st.columns([1, 2, 1])
+        spacer1, center_col, spacer2 = st.columns([1, 4, 1])
+
         with center_col:
-            col_a, col_b = st.columns([1, 1])
-            with col_a:
+
+            inner1, inner2 = st.columns([1, 1])
+            with inner1:
                 if st.button("CLO Model"):
                     st.query_params["view"] = "clo"
                     st.rerun()
-            with col_b:
+            with inner2:
                 if st.button("CMBS Model"):
                     st.query_params["view"] = "cmbs"
                     st.rerun()

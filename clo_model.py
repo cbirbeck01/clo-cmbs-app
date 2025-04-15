@@ -388,8 +388,10 @@ def run_clo_model():
         st.dataframe(annual_df,use_container_width=True)
 
         # Monthly Cashflows
+        df.rename(columns={"Mezz Interest":"Mezzanine Interest"},inplace=True)
         st.subheader("Monthly Cashflows")
         st.dataframe(df,use_container_width=True)
+
 
 
 

@@ -90,9 +90,7 @@ def run_cmbs_model():
         insidetextanchor="middle",
         hoverinfo="x+text",
         connector={"line": {"color": "#2d6cd2", "width": 1.5}},
-        decreasing={"marker": {"color": "#2d6cd2"}},
-        increasing={"marker": {"color": "#2d6cd2"}},
-        totals={"marker": {"color": "#27a119"}},
+        marker=dict(color=["#34af30","#2d6cd2","#2d6cd2","#2d6cd2"])
         opacity=0.75
     ))
 

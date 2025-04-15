@@ -55,17 +55,15 @@ def run_cmbs_model():
         years
     )
 
-    senior_interest_paid = df["Senior Interest"].sum()
-    senior_principal = df["Senior Principal"].sum()
-    mezz_interest_paid = df["Mezz Interest"].sum()
-    mezz_principal = df["Mezz Principal"].sum()
-    equity_paid = df["Equity Cash"].sum()
+    senior_interest_paid=df["Senior Interest"].sum()
+    senior_principal_paid=df["Senior Principal"].sum()
+    mezz_interest_paid=df["Mezzanine Interest"].sum() if "Mezzanine Interest" in df.columns else df["Mezz Interest"].sum()
+    mezz_principal_paid=df["Mezz Principal"].sum()
+    equity_paid=df["Equity Cash"].sum()
 
-    senior_paid = senior_interest_paid + senior_principal
-    mezz_paid = mezz_interest_paid + mezz_principal
-    principal_paid = senior_principal + mezz_principal
-    net_cash = senior_paid + mezz_paid + equity_paid
-    expected_loss = total_loan_pool * (default_rate / 100) * (loss_severity / 100)
+    expected_loss=total_loan_pool*(default_rate/100)*(loss_severity/100)
+    net_cash=senior_interest_paid+senior_principal_paid+mezz_interest_paid+mezz_principal_paid+equity_paid
+
 
     def to_millions(value):
         return f"${value / 1_000_000:.2f}M"
@@ -110,16 +108,20 @@ def run_cmbs_model():
     col3.metric("Equity IRR", f"{eq_irr:.2f}%")
 
     st.subheader("Tranche Summary")
-    col4, col5 = st.columns(2)
-    with col4:
-        st.metric("Senior Paid", to_millions(senior_paid))
-        st.metric("Mezzanine Paid", to_millions(mezz_paid))
-        st.metric("Principal Paid", to_millions(principal_paid))
-    with col5:
-        st.metric("Equity Residual", to_millions(equity_paid))
-        st.metric("Expected Loss", to_millions(expected_loss))
-        st.metric("Net Cash Distributed", to_millions(net_cash))
+
+    col1,col2=st.columns(2)
+    with col1:
+        st.metric("Senior Interest",f"${senior_interest_paid/1_000_000:.2f}M")
+        st.metric("Senior Principal",f"${senior_principal_paid/1_000_000:.2f}M")
+        st.metric("Mezzanine Interest",f"${mezz_interest_paid/1_000_000:.2f}M")
+        st.metric("Mezzanine Principal",f"${mezz_principal_paid/1_000_000:.2f}M")
+    with col2:
+        st.metric("Equity Residual",f"${equity_paid/1_000_000:.2f}M")
+        st.metric("Expected Loss",f"${expected_loss/1_000_000:.2f}M")
+        st.metric("Net Cash Distributed",f"${net_cash/1_000_000:.2f}M")
+
 
     st.subheader("Monthly Cashflows")
     df.rename(columns={"Mezz Interest": "Mezzanine Interest"}, inplace=True)
+    df.rename(columns={"Mezz Principal": "Mezzanine Principal"}, inplace=True)
     st.dataframe(df, use_container_width=True)

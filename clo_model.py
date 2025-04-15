@@ -223,16 +223,17 @@ def run_clo_model():
             st.plotly_chart(fig, use_container_width=True)
 
             st.subheader("Tranche Summary")
-
-            col1, col2 = st.columns(2)
+            col1,col2,col3=st.columns(3)
             with col1:
-                st.metric("Senior Paid", f"${senior_paid / 1_000_000:.2f}M")
-                st.metric("Mezzanine Paid", f"${mezz_paid / 1_000_000:.2f}M")
-                st.metric("Principal Paid", f"${principal_paid / 1_000_000:.2f}M")
+                st.metric("Senior Interest",f"${senior_interest_paid/1_000_000:.2f}M")
+                st.metric("Senior Principal",f"${senior_principal_paid/1_000_000:.2f}M")
             with col2:
-                st.metric("Equity Residual", f"${equity_paid / 1_000_000:.2f}M")
-                st.metric("Expected Loss", f"${expected_loss / 1_000_000:.2f}M")
-                st.metric("Net Cash Distributed", f"${net_cash / 1_000_000:.2f}M")
+                st.metric("Mezzanine Interest",f"${mezz_interest_paid/1_000_000:.2f}M")
+                st.metric("Mezzanine Principal",f"${mezz_principal_paid/1_000_000:.2f}M")
+            with col3:
+                st.metric("Equity Residual",f"${equity_paid/1_000_000:.2f}M")
+                st.metric("Expected Loss",f"${expected_loss/1_000_000:.2f}M")
+                st.metric("Net Cash Distributed",f"${net_cash/1_000_000:.2f}M")
 
             # Close the wrapper
             st.markdown("</div>", unsafe_allow_html=True)

@@ -351,7 +351,7 @@ def run_clo_model():
         ))
 
         fig.update_layout(
-            title="CLO Tranche Waterfall Distribution",
+            title="",
             showlegend=False,
             xaxis=dict(
                 title=dict(text="Cash Flow Step", font=dict(color="black", size=14)),

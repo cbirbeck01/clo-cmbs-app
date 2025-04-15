@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy_financial as npf
 
-def simulate_cmbs_cashflows(total_loan_pool,senior_size,mezz_size,equity_size,senior_rate,mezz_rate,default_rate,loss_severity,noi_yield,years):
+def simulate_cmbs_cashflows(total_loan_pool,senior_size,mezz_size,equity_size,senior_rate,mezz_rate,default_rate,loss_severity,noi_yield,years,reinvest_toggle=False):
     months=years*12
     senior_bal=senior_size
     mezz_bal=mezz_size
@@ -25,15 +25,19 @@ def simulate_cmbs_cashflows(total_loan_pool,senior_size,mezz_size,equity_size,se
         mz_int_paid=min(mz_int_due,net_cash)
         net_cash-=mz_int_paid
 
-        sr_prin_sched=senior_size/months
-        sr_prin_paid=min(sr_prin_sched,senior_bal,net_cash)
-        senior_bal-=sr_prin_paid
-        net_cash-=sr_prin_paid
+        if reinvest_toggle and m <= 36:
+            sr_prin_paid = 0
+            mz_prin_paid = 0
+        else:
+            sr_prin_sched = senior_size / months
+            sr_prin_paid = min(sr_prin_sched, senior_bal, net_cash)
+            senior_bal -= sr_prin_paid
+            net_cash -= sr_prin_paid
 
-        mz_prin_sched=mezz_size/months
-        mz_prin_paid=min(mz_prin_sched,mezz_bal,net_cash)
-        mezz_bal-=mz_prin_paid
-        net_cash-=mz_prin_paid
+            mz_prin_sched = mezz_size / months
+            mz_prin_paid = min(mz_prin_sched, mezz_bal, net_cash)
+            mezz_bal -= mz_prin_paid
+            net_cash -= mz_prin_paid
 
         eq_paid=max(net_cash,0)
 

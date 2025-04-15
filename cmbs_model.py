@@ -127,7 +127,7 @@ def run_cmbs_model():
             yaxis_title="Amount ($)",
             font=dict(family="Helvetica", size=14, color="black"),
             height=500,
-            plot_bgcolor="white"
+            plot_bgcolor="rgba(0,0,0,0)"
         )
 
         st.plotly_chart(fig, use_container_width=True)

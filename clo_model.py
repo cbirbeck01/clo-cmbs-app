@@ -20,6 +20,7 @@ def run_clo_model():
 
     if st.button("Back to Home"):
         st.query_params["view"] = "home"
+        st.rerun()
 
     with st.sidebar:
         st.header("Tranche Inputs")

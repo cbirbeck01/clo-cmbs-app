@@ -15,8 +15,6 @@ def create_cmbs_annual_cashflow_summary(df, years):
 def run_cmbs_model():
 
     with st.container():
-        st.title("CMBS Cash Flow Model")
-
         if st.button("Back to Home"):
             st.query_params["view"] = "home"
             st.rerun()
@@ -78,7 +76,7 @@ def run_cmbs_model():
                     loss_severity=max(loss_severity - 3, 0)
 
 
-        df, sr_irr, mz_irr, eq_irr = simulate_cmbs_cashflows(
+            df, sr_irr, mz_irr, eq_irr = simulate_cmbs_cashflows(
             total_loan_pool,
             senior_size,
             mezz_size,
@@ -89,7 +87,7 @@ def run_cmbs_model():
             loss_severity,
             noi_yield,
             years
-        )
+            )
 
         senior_paid = df["Senior Interest"].sum() + df["Senior Principal"].sum()
         mezz_paid = df["Mezz Interest"].sum() + df["Mezz Principal"].sum()

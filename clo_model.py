@@ -195,7 +195,7 @@ def run_clo_model():
                 margin=dict(t=50, l=40, r=40, b=50),
                 xaxis=dict(range=[0, 1], visible=False),
                 yaxis=dict(range=[0, y_base + 1], visible=False),
-                title="CLO Tranche Fill Funnel",
+                title="",
                 plot_bgcolor="rgba(0,0,0,0)"
             )
 

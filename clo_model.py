@@ -23,7 +23,7 @@ def run_clo_model():
         st.rerun()
 
     with st.sidebar:
-        st.header("Tranche Inputs")
+        st.header("Deal Inputs")
         total_collateral = st.number_input("Total Collateral ($)", value=110_000_000, step=1_000_000)
         senior_size = st.number_input("Senior Size ($)", value=70_000_000, step=1_000_000)
         mezz_size = st.number_input("Mezzanine Size ($)", value=40_000_000, step=1_000_000)

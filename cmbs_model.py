@@ -123,12 +123,12 @@ def run_cmbs_model():
             -(mezz_interest_paid+mezz_principal),
             equity_paid if equity_paid>0 else -1_000_000
             ],
-           text=[
+       
+            text=[
                 to_millions(net_cash),
                 to_millions(senior_interest_paid+senior_principal),
                 to_millions(mezz_interest_paid+mezz_principal),
-                to_millions(equity_paid)
-                ],
+                to_millions(equity_paid)],
             textposition="inside",
             insidetextanchor="middle",
             hoverinfo="x+text",

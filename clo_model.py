@@ -258,8 +258,11 @@ def run_clo_model():
             annual_df[col] = annual_df[col].apply(lambda x: f"${x / 1_000_000:.2f}M")
         st.dataframe(annual_df, use_container_width=True)
 
+        # Monthly Cashflows
+        df.rename(columns={"Mezz Interest":"Mezzanine Interest"},inplace=True)
+        df.rename(columns={"Mezz Principal":"Mezzanine Principal"},inplace=True)
         st.subheader("Monthly Cashflows")
-        st.dataframe(df, use_container_width=True)
+        st.dataframe(df,use_container_width=True)
 
 #WATERFALL VIEW:
 
@@ -389,6 +392,7 @@ def run_clo_model():
 
         # Monthly Cashflows
         df.rename(columns={"Mezz Interest":"Mezzanine Interest"},inplace=True)
+        df.rename(columns={"Mezz Principal":"Mezzanine Principal"},inplace=True)
         st.subheader("Monthly Cashflows")
         st.dataframe(df,use_container_width=True)
 

@@ -2,6 +2,28 @@ import streamlit as st
 from clo_model import run_clo_model
 from cmbs_model import run_cmbs_model
 
+st.markdown("""
+<style>
+.custom-button {
+    display:inline-block;
+    padding:16px 28px;
+    font-size:18px;
+    font-weight:600;
+    color:white;
+    background-color:#31910d;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    transition:0.3s;
+    margin:10px;
+}
+.custom-button:hover {
+    background-color:#005A9C;
+}
+</style>
+""", unsafe_allow_html=True)
+
+
 st.set_page_config(page_title="Asset Backed Securities Visualizer", layout="wide")
 
 view = st.query_params.get("view", "home")

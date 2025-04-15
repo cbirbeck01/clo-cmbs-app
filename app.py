@@ -3,6 +3,7 @@ from clo_model import run_clo_model
 from cmbs_model import run_cmbs_model
 
 st.set_page_config(page_title="Asset Backed Securities Visualizer", layout="wide")
+
 st.markdown("""
 <style>
 div.stButton > button {
@@ -22,25 +23,29 @@ div.stButton > button:hover {
 """, unsafe_allow_html=True)
 
 
-
 view = st.query_params.get("view", "home")
 
 if view=="home":
-    st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
     st.title("Asset Backed Securities Visualizer")
-    st.markdown("### Select a product type to begin:")
 
-    col1, col2=st.columns(2)
 
-    with col1:
-        if st.button("CLO"):
-            st.query_params["view"] = "clo"
-            st.rerun()
+    st.markdown("<div style='height:25vh;'></div>", unsafe_allow_html=True)
 
-    with col2:
-        if st.button("CMBS"):
-            st.query_params["view"] = "cmbs"
-            st.rerun()
+    #horizontal spacing
+    spacer1, center_col, spacer2 = st.columns([1, 2, 1])
+    with center_col:
+        st.markdown("### Select a product type to begin:")
+        col1, col2 = st.columns(2)
+
+        with col1:
+            if st.button("🚀 CLO Waterfall"):
+                st.query_params["view"]="clo"
+                st.rerun()
+
+        with col2:
+            if st.button("🏢 CMBS Model"):
+                st.query_params["view"]="cmbs"
+                st.rerun()
 
 elif view=="clo":
     run_clo_model()

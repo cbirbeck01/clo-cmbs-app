@@ -27,6 +27,14 @@ view = st.query_params.get("view", "home")
 
 if view=="home":
 
+elif view=="clo":
+    run_clo_model()
+
+elif view=="cmbs":
+    run_cmbs_model()
+
+else:
+    st.error("Invalid view.")
 
 
     with st.container():
@@ -49,11 +57,3 @@ if view=="home":
 
 
 
-elif view=="clo":
-    run_clo_model()
-
-elif view=="cmbs":
-    run_cmbs_model()
-
-else:
-    st.error("Invalid view.")

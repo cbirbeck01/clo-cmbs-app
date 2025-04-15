@@ -92,7 +92,7 @@ def run_cmbs_model():
         connector={"line": {"color": "#2d6cd2", "width": 1.5}},
         marker=dict(color=["#34af30","#2d6cd2","#2d6cd2","#2d6cd2"]),
         opacity=0.75
-    ))
+        ))
 
     fig.update_layout(
         title="CMBS Tranche Waterfall Distribution",

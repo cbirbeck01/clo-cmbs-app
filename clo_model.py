@@ -5,20 +5,19 @@ import pandas as pd
 
 
 def create_clo_annual_cashflow_summary(df, years):
-    df["Year"]=(df["Month"]-1)//12+1
-    summary=df.groupby("Year")[["Senior Interest","Senior Principal","Mezz Interest","Mezz Principal","Equity Cash"]].sum().reset_index()
-    summary["Senior Cash Flow"]=summary["Senior Interest"]+summary["Senior Principal"]
-    summary["Mezzanine Cash Flow"]=summary["Mezz Interest"]+summary["Mezz Principal"]
-    summary["Equity Cash Flow"]=summary["Equity Cash"]
-    summary["Year Label"]=summary["Year"].apply(lambda x:f"Year {x}")
-    return summary[["Year Label","Senior Cash Flow","Mezzanine Cash Flow","Equity Cash Flow"]]
+    df["Year"] = (df["Month"] - 1) // 12 + 1
+    summary = df.groupby("Year")[
+        ["Senior Interest", "Senior Principal", "Mezz Interest", "Mezz Principal", "Equity Cash"]].sum().reset_index()
+    summary["Senior Cash Flow"] = summary["Senior Interest"] + summary["Senior Principal"]
+    summary["Mezzanine Cash Flow"] = summary["Mezz Interest"] + summary["Mezz Principal"]
+    summary["Equity Cash Flow"] = summary["Equity Cash"]
+    summary["Year Label"] = summary["Year"].apply(lambda x: f"Year {x}")
+    return summary[["Year Label", "Senior Cash Flow", "Mezzanine Cash Flow", "Equity Cash Flow"]]
 
 
 def run_clo_model():
-
     st.title("CLO Waterfall")
 
-    
     if st.button("Back to Home"):
         st.query_params["view"] = "home"
         st.rerun()
@@ -33,8 +32,11 @@ def run_clo_model():
 
         scenario = st.selectbox("Stress Scenario", ["Custom", "Mild", "Moderate", "Severe"])
 
+        reinvest_toggle = st.checkbox("Enable Reinvestment Period (Years 1–3)", value=True)
+
         st.header("Assumptions")
-        st.markdown("Scenarios account for default rates, recovery rates, and collateral yield according to severity. Use 'Custom' for manual input.")
+        st.markdown(
+            "Scenarios account for default rates, recovery rates, and collateral yield according to severity. Use 'Custom' for manual input.")
         if scenario == "Custom":
             default_rate = st.slider("Default Rate (%)", 0.0, 40.0, 10.0)
             recovery_rate = st.slider("Recovery Rate (%)", 0.0, 100.0, 30.0)
@@ -62,8 +64,6 @@ def run_clo_model():
         mezz_rate = st.number_input("Mezz Coupon (%)", 1.0, 15.0, 8.0, step=0.5)
         years = st.number_input("Years", 1, 10, 5)
 
-
-
     int_income = total_collateral * (collateral_yield / 100) * years
     default_loss = total_collateral * (default_rate / 100)
     recoveries = default_loss * (recovery_rate / 100)
@@ -87,7 +87,8 @@ def run_clo_model():
         default_rate,
         recovery_rate,
         collateral_yield,
-        years
+        years,
+        reinvest_toggle
     )
 
     # Use cumulative results for visuals
@@ -112,7 +113,8 @@ def run_clo_model():
         tranches = list(reversed([
             {"label": "Senior", "expected": senior_interest, "paid": senior_paid, "color": "rgba(1,31,75,0.7)"},
             {"label": "Mezzanine", "expected": mezz_interest, "paid": mezz_paid, "color": "rgba(0,91,150,0.6)"},
-            {"label": "Principal", "expected": principal_repayment, "paid": principal_paid, "color": "rgba(100,151,177, 0.5)"},
+            {"label": "Principal", "expected": principal_repayment, "paid": principal_paid,
+             "color": "rgba(100,151,177, 0.5)"},
             {"label": "Equity", "expected": equity_paid + 1e-6, "paid": equity_paid, "color": "rgba(179,205,224, 0.4)"}
         ]))
 
@@ -129,12 +131,16 @@ def run_clo_model():
             label = tranche["label"]
             flag = status_flag(tranche["paid"], tranche["expected"])
 
-            fig.add_shape(type="rect", x0=0.3, x1=0.7, y0=y_base, y1=y_base + filled_height, fillcolor=color, line=dict(color="black", width=1), layer="below")
+            fig.add_shape(type="rect", x0=0.3, x1=0.7, y0=y_base, y1=y_base + filled_height, fillcolor=color,
+                          line=dict(color="black", width=1), layer="below")
 
             if empty_height > 0:
-                fig.add_shape(type="rect", x0=0.3, x1=0.7, y0=y_base + filled_height, y1=y_base + bar_height, fillcolor="rgba(230,230,230,0.3)", line=dict(color="gray", width=0.5), layer="below")
+                fig.add_shape(type="rect", x0=0.3, x1=0.7, y0=y_base + filled_height, y1=y_base + bar_height,
+                              fillcolor="rgba(230,230,230,0.3)", line=dict(color="gray", width=0.5), layer="below")
 
-            fig.add_annotation(x=0.75, y=y_base + bar_height / 2, text=f"<b>{label}</b> {flag}<br>${tranche['paid']:,.0f}", showarrow=False, font=dict(size=14, color="black", family="Helvetica"), align="left", xanchor="left")
+            fig.add_annotation(x=0.75, y=y_base + bar_height / 2,
+                               text=f"<b>{label}</b> {flag}<br>${tranche['paid']:,.0f}", showarrow=False,
+                               font=dict(size=14, color="black", family="Helvetica"), align="left", xanchor="left")
 
             fig.add_annotation(
                 x=0.3, y=y_base + bar_height / 2,
@@ -150,19 +156,20 @@ def run_clo_model():
 
             y_base += bar_height + bar_gap
 
-        fig.add_shape(type="rect", x0=0.0, x1=0.15, y0=0, y1=y_base - bar_gap, fillcolor="rgba(180,220,255,0.6)", line=dict(color="black", width=1), layer="below")
-        fig.add_annotation(x=0.075, y=(y_base - bar_gap) / 2, text=f"<b>Loan Pool</b><br>${total_collateral:,.0f}", showarrow=False, font=dict(size=13, color="black"), align="center")
+        fig.add_shape(type="rect", x0=0.0, x1=0.15, y0=0, y1=y_base - bar_gap, fillcolor="rgba(180,220,255,0.6)",
+                      line=dict(color="black", width=1), layer="below")
+        fig.add_annotation(x=0.075, y=(y_base - bar_gap) / 2, text=f"<b>Loan Pool</b><br>${total_collateral:,.0f}",
+                           showarrow=False, font=dict(size=13, color="black"), align="center")
 
         fig.update_layout(
-                autosize=True,
-                height=750,
-                margin=dict(t=50, l=40, r=40, b=50),
-                xaxis=dict(range=[0, 1], visible=False),
-                yaxis=dict(range=[0, y_base + 1], visible=False),
-                title="",
-                plot_bgcolor="rgba(0,0,0,0)"
-            )
-
+            autosize=True,
+            height=750,
+            margin=dict(t=50, l=40, r=40, b=50),
+            xaxis=dict(range=[0, 1], visible=False),
+            yaxis=dict(range=[0, y_base + 1], visible=False),
+            title="",
+            plot_bgcolor="rgba(0,0,0,0)"
+        )
 
         left_spacer, center_col, right_spacer = st.columns([0.1, 0.8, 0.1])
 
@@ -189,28 +196,28 @@ def run_clo_model():
             st.plotly_chart(fig, use_container_width=True)
 
         # Tranche Summary Breakdown
-        senior_interest_paid=df["Senior Interest"].sum()
-        senior_principal_paid=df["Senior Principal"].sum()
-        mezz_interest_paid=df["Mezzanine Interest"].sum() if "Mezzanine Interest" in df.columns else df["Mezz Interest"].sum()
-        mezz_principal_paid=df["Mezz Principal"].sum()
-        equity_paid=df["Equity Cash"].sum()
+        senior_interest_paid = df["Senior Interest"].sum()
+        senior_principal_paid = df["Senior Principal"].sum()
+        mezz_interest_paid = df["Mezzanine Interest"].sum() if "Mezzanine Interest" in df.columns else df[
+            "Mezz Interest"].sum()
+        mezz_principal_paid = df["Mezz Principal"].sum()
+        equity_paid = df["Equity Cash"].sum()
 
-        expected_loss=total_collateral*(default_rate/100)*(1-recovery_rate/100)
-        net_cash=senior_interest_paid+senior_principal_paid+mezz_interest_paid+mezz_principal_paid+equity_paid
+        expected_loss = total_collateral * (default_rate / 100) * (1 - recovery_rate / 100)
+        net_cash = senior_interest_paid + senior_principal_paid + mezz_interest_paid + mezz_principal_paid + equity_paid
 
         st.subheader("Tranche Summary")
-        col1,col2,col3=st.columns(3)
+        col1, col2, col3 = st.columns(3)
         with col1:
-            st.metric("Senior Interest",f"${senior_interest_paid/1_000_000:.2f}M")
-            st.metric("Senior Principal",f"${senior_principal_paid/1_000_000:.2f}M")
+            st.metric("Senior Interest", f"${senior_interest_paid / 1_000_000:.2f}M")
+            st.metric("Senior Principal", f"${senior_principal_paid / 1_000_000:.2f}M")
         with col2:
-            st.metric("Mezzanine Interest",f"${mezz_interest_paid/1_000_000:.2f}M")
-            st.metric("Mezzanine Principal",f"${mezz_principal_paid/1_000_000:.2f}M")
+            st.metric("Mezzanine Interest", f"${mezz_interest_paid / 1_000_000:.2f}M")
+            st.metric("Mezzanine Principal", f"${mezz_principal_paid / 1_000_000:.2f}M")
         with col3:
-            st.metric("Equity Residual",f"${equity_paid/1_000_000:.2f}M")
-            st.metric("Expected Loss",f"${expected_loss/1_000_000:.2f}M")
-            st.metric("Net Cash Distributed",f"${net_cash/1_000_000:.2f}M")
-
+            st.metric("Equity Residual", f"${equity_paid / 1_000_000:.2f}M")
+            st.metric("Expected Loss", f"${expected_loss / 1_000_000:.2f}M")
+            st.metric("Net Cash Distributed", f"${net_cash / 1_000_000:.2f}M")
 
             # Close the wrapper
             st.markdown("</div>", unsafe_allow_html=True)
@@ -226,9 +233,10 @@ def run_clo_model():
 
         st.subheader("Tranche IRRs")
         col1, col2, col3 = st.columns(3)
-        col1.metric("Senior IRR", f"{sr_irr:.2f}%")
-        col2.metric("Mezzanine IRR", f"{mz_irr:.2f}%")
-        col3.metric("Equity IRR", f"{eq_irr:.2f}%")
+
+        col1.metric("Senior IRR", f"{senior_irr:.2f}%" if not pd.isna(senior_irr) else "n/a")
+        col2.metric("Mezzanine IRR", f"{mezz_irr:.2f}%" if not pd.isna(mezz_irr) else "n/a")
+        col3.metric("Equity IRR", f"{equity_irr:.2f}%" if not pd.isna(equity_irr) else "n/a")
 
         st.subheader("Annual Cash Flow Summary")
         annual_df = create_clo_annual_cashflow_summary(df, years)
@@ -237,49 +245,48 @@ def run_clo_model():
         st.dataframe(annual_df, use_container_width=True)
 
         # Monthly Cashflows
-        df.rename(columns={"Mezz Interest":"Mezzanine Interest"},inplace=True)
-        df.rename(columns={"Mezz Principal":"Mezzanine Principal"},inplace=True)
+        df.rename(columns={"Mezz Interest": "Mezzanine Interest"}, inplace=True)
+        df.rename(columns={"Mezz Principal": "Mezzanine Principal"}, inplace=True)
         st.subheader("Monthly Cashflows")
-        st.dataframe(df,use_container_width=True)
+        st.dataframe(df, use_container_width=True)
 
-#WATERFALL VIEW:
+    # WATERFALL VIEW:
 
     elif chart_view == "Simplified Waterfall View":
         senior_flag = status_flag(senior_paid, senior_interest)
         mezz_flag = status_flag(mezz_paid, mezz_interest)
         principal_flag = status_flag(principal_paid, principal_repayment)
         equity_flag = status_flag(equity_paid, 0.01)
-        expected_senior_total=senior_interest+principal_repayment*(senior_size/(senior_size+mezz_size))
-        expected_mezz_total=mezz_interest+principal_repayment*(mezz_size/(senior_size+mezz_size))
-
+        expected_senior_total = senior_interest + principal_repayment * (senior_size / (senior_size + mezz_size))
+        expected_mezz_total = mezz_interest + principal_repayment * (mezz_size / (senior_size + mezz_size))
 
         x_labels = [
-        "Available Cash",
-        "Senior",
-        "Mezzanine",
-        "Equity"
+            "Available Cash",
+            "Senior",
+            "Mezzanine",
+            "Equity"
         ]
-
 
         y_values = [
-        available_cash,
-        -senior_paid,
-        -mezz_paid,
-        equity_paid if equity_paid > 0 else -1_000_000
+            available_cash,
+            -senior_paid,
+            -mezz_paid,
+            equity_paid if equity_paid > 0 else -1_000_000
         ]
 
-
-        measure = ["relative","relative","relative","relative"]
+        measure = ["relative", "relative", "relative", "relative"]
         show_percentage = st.checkbox("Show Percent of Expected Payout", value=False)
 
         def format_millions(value):
             return f"{value / 1_000_000:.1f}M"
 
-        text_labels=[
-        format_millions(available_cash),
-        format_millions(senior_paid)+(f" ({(senior_paid/expected_senior_total*100):.1f}%)" if show_percentage else ""),
-        format_millions(mezz_paid)+(f" ({(mezz_paid/expected_mezz_total*100):.1f}%)" if show_percentage else ""),
-        format_millions(equity_paid)
+        text_labels = [
+            format_millions(available_cash),
+            format_millions(senior_paid) + (
+                f" ({(senior_paid / expected_senior_total * 100):.1f}%)" if show_percentage else ""),
+            format_millions(mezz_paid) + (
+                f" ({(mezz_paid / expected_mezz_total * 100):.1f}%)" if show_percentage else ""),
+            format_millions(equity_paid)
         ]
 
         hover_text = [
@@ -290,10 +297,6 @@ def run_clo_model():
             + (f" ({(mezz_paid / expected_mezz_total * 100):.1f}%)" if show_percentage else ""),
             f"Equity Residual: ${equity_paid:,.0f} {equity_flag}"
         ]
-
-
-
-        
 
         fig = go.Figure(go.Waterfall(
             name="CLO Waterfall",
@@ -331,7 +334,7 @@ def run_clo_model():
             height=750,
             transition_duration=500
         )
-        # Recreate IRR table for CSV download
+
         senior_cf = [-senior_size] + [senior_paid / years] * (years - 1) + [senior_paid / years + senior_size]
         mezz_cf = [-mezz_size] + [mezz_paid / years] * (years - 1) + [mezz_paid / years + mezz_size]
         equity_cf = [-equity_size] + [equity_paid / years] * years
@@ -342,50 +345,47 @@ def run_clo_model():
         st.plotly_chart(fig)
         # IRR Summary
         st.subheader("Tranche IRRs")
-        col1,col2,col3=st.columns(3)
-        col1.metric("Senior IRR",f"{senior_irr:.2f}%")
-        col2.metric("Mezzanine IRR",f"{mezz_irr:.2f}%")
-        col3.metric("Equity IRR",f"{equity_irr:.2f}%")
-
-
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Senior IRR", f"{senior_irr:.2f}%")
+        col2.metric("Mezzanine IRR", f"{mezz_irr:.2f}%")
+        col3.metric("Equity IRR", f"{equity_irr:.2f}%")
 
         # Tranche Summary Breakdown
-        senior_interest_paid=df["Senior Interest"].sum()
-        senior_principal_paid=df["Senior Principal"].sum()
-        mezz_interest_paid=df["Mezzanine Interest"].sum() if "Mezzanine Interest" in df.columns else df["Mezz Interest"].sum()
-        mezz_principal_paid=df["Mezz Principal"].sum()
-        equity_paid=df["Equity Cash"].sum()
+        senior_interest_paid = df["Senior Interest"].sum()
+        senior_principal_paid = df["Senior Principal"].sum()
+        mezz_interest_paid = df["Mezzanine Interest"].sum() if "Mezzanine Interest" in df.columns else df[
+            "Mezz Interest"].sum()
+        mezz_principal_paid = df["Mezz Principal"].sum()
+        equity_paid = df["Equity Cash"].sum()
 
-        expected_loss=total_collateral*(default_rate/100)*(1-recovery_rate/100)
-        net_cash=senior_interest_paid+senior_principal_paid+mezz_interest_paid+mezz_principal_paid+equity_paid
+        expected_loss = total_collateral * (default_rate / 100) * (1 - recovery_rate / 100)
+        net_cash = senior_interest_paid + senior_principal_paid + mezz_interest_paid + mezz_principal_paid + equity_paid
 
         st.subheader("Tranche Summary")
-        col1,col2,col3=st.columns(3)
+        col1, col2, col3 = st.columns(3)
         with col1:
-            st.metric("Senior Interest",f"${senior_interest_paid/1_000_000:.2f}M")
-            st.metric("Senior Principal",f"${senior_principal_paid/1_000_000:.2f}M")
+            st.metric("Senior Interest", f"${senior_interest_paid / 1_000_000:.2f}M")
+            st.metric("Senior Principal", f"${senior_principal_paid / 1_000_000:.2f}M")
         with col2:
-            st.metric("Mezzanine Interest",f"${mezz_interest_paid/1_000_000:.2f}M")
-            st.metric("Mezzanine Principal",f"${mezz_principal_paid/1_000_000:.2f}M")
+            st.metric("Mezzanine Interest", f"${mezz_interest_paid / 1_000_000:.2f}M")
+            st.metric("Mezzanine Principal", f"${mezz_principal_paid / 1_000_000:.2f}M")
         with col3:
-            st.metric("Equity Residual",f"${equity_paid/1_000_000:.2f}M")
-            st.metric("Expected Loss",f"${expected_loss/1_000_000:.2f}M")
-            st.metric("Net Cash Distributed",f"${net_cash/1_000_000:.2f}M")
-
+            st.metric("Equity Residual", f"${equity_paid / 1_000_000:.2f}M")
+            st.metric("Expected Loss", f"${expected_loss / 1_000_000:.2f}M")
+            st.metric("Net Cash Distributed", f"${net_cash / 1_000_000:.2f}M")
 
         # Annual Summary
         st.subheader("Annual Cash Flow Summary")
-        annual_df=create_clo_annual_cashflow_summary(df,years)
-        for col in ["Senior Cash Flow","Mezzanine Cash Flow","Equity Cash Flow"]:
-            annual_df[col]=annual_df[col].apply(lambda x:f"${x/1_000_000:.2f}M")
-        st.dataframe(annual_df,use_container_width=True)
+        annual_df = create_clo_annual_cashflow_summary(df, years)
+        for col in ["Senior Cash Flow", "Mezzanine Cash Flow", "Equity Cash Flow"]:
+            annual_df[col] = annual_df[col].apply(lambda x: f"${x / 1_000_000:.2f}M")
+        st.dataframe(annual_df, use_container_width=True)
 
         # Monthly Cashflows
-        df.rename(columns={"Mezz Interest":"Mezzanine Interest"},inplace=True)
-        df.rename(columns={"Mezz Principal":"Mezzanine Principal"},inplace=True)
+        df.rename(columns={"Mezz Interest": "Mezzanine Interest"}, inplace=True)
+        df.rename(columns={"Mezz Principal": "Mezzanine Principal"}, inplace=True)
         st.subheader("Monthly Cashflows")
-        st.dataframe(df,use_container_width=True)
-
+        st.dataframe(df, use_container_width=True)
 
 
 

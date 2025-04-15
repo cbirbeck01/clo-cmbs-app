@@ -317,6 +317,14 @@ def run_clo_model():
         format_millions(equity_paid)
         ]
 
+        hover_text = [
+            f"Available Cash: ${available_cash:,.0f}",
+            f"Senior Interest: ${senior_paid:,.0f} of ${senior_interest:,.0f} {senior_flag}"
+            + (f" ({(senior_paid / senior_interest * 100):.1f}%)" if show_percentage else ""),
+            f"Mezzanine Interest: ${mezz_paid:,.0f} of ${mezz_interest:,.0f} {mezz_flag}"
+            + (f" ({(mezz_paid / mezz_interest * 100):.1f}%)" if show_percentage else ""),
+            f"Equity Residual: ${equity_paid:,.0f} {equity_flag}"
+        ]
 
 
 

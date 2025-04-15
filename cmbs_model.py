@@ -168,14 +168,16 @@ def run_cmbs_model():
         cf_table["Mezzanine Cash Flow"] = cf_table["Mezzanine Cash Flow"].apply(to_millions)
         cf_table["Equity Cash Flow"] = cf_table["Equity Cash Flow"].apply(to_millions)
 
-        st.subheader("Annual Cash Flow Summary")
-        st.dataframe(cf_table, use_container_width=True)
+
 
         st.subheader("Tranche IRRs")
         col1, col2, col3 = st.columns(3)
         col1.metric("Senior IRR", f"{sr_irr:.2f}%")
         col2.metric("Mezzanine IRR", f"{mz_irr:.2f}%")
         col3.metric("Equity IRR", f"{eq_irr:.2f}%" if not pd.isna(eq_irr) else "n/a")
+
+        st.subheader("Annual Cash Flow Summary")
+        st.dataframe(cf_table, use_container_width=True)
 
         st.subheader("Monthly Cashflows")
         df.rename(columns={"Mezz Interest": "Mezzanine Interest"}, inplace=True)

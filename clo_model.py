@@ -99,26 +99,16 @@ def run_clo_model():
 
     remaining_cash = available_cash
 
-    from clo_periodic_cashflow import simulate_clo_cashflows
+    senior_paid = min(senior_interest, remaining_cash)
+    remaining_cash -= senior_paid
 
-    df, sr_irr, mz_irr, eq_irr = simulate_clo_cashflows(
-        total_collateral,
-        senior_size,
-        mezz_size,
-        equity_size,
-        senior_rate,
-        mezz_rate,
-        default_rate,
-        recovery_rate,
-        collateral_yield,
-        years
-    )
+    mezz_paid = min(mezz_interest, remaining_cash)
+    remaining_cash -= mezz_paid
 
-    # Use cumulative results for visuals
-    senior_paid = df["Senior Interest"].sum() + df["Senior Principal"].sum()
-    mezz_paid = df["Mezz Interest"].sum() + df["Mezz Principal"].sum()
-    principal_paid = df["Senior Principal"].sum() + df["Mezz Principal"].sum()
-    equity_paid = df["Equity Cash"].sum()
+    principal_paid = min(principal_repayment, remaining_cash)
+    remaining_cash -= principal_paid
+
+    equity_paid = max(remaining_cash, 0)
 
     chart_view = st.selectbox("Select Chart View", ["Tranche View", "Waterfall View"], index=0)
 
@@ -225,15 +215,12 @@ def run_clo_model():
         irr_df = pd.DataFrame({
             "Tranche": ["Senior", "Mezzanine", "Equity"],
             "Initial Investment": [senior_size, mezz_size, equity_size],
-            "Total Paid": [senior_paid, mezz_paid, equity_paid],
-            "IRR (%)": [f"{sr_irr:.2f}", f"{mz_irr:.2f}", f"{eq_irr:.2f}"]
+            "Total Paid": [senior_paid + senior_size, mezz_paid + mezz_size, equity_paid],
+            "IRR (%)": [f"{senior_irr:.2f}", f"{mezz_irr:.2f}", f"{equity_irr:.2f}"]
         })
 
         st.subheader("Tranche IRR Summary Table")
         st.dataframe(irr_df, use_container_width=True)
-
-        st.subheader("Monthly Cashflows")
-        st.dataframe(df, use_container_width=True)
 
     elif chart_view == "Waterfall View":
         senior_flag = status_flag(senior_paid, senior_interest)

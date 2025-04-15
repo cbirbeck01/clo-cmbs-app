@@ -4,6 +4,7 @@ import pandas as pd
 import numpy_financial as npf
 from cmbs_periodic_cashflow import simulate_cmbs_cashflows
 
+
 def run_cmbs_model():
     st.title("CMBS Cash Flow Model")
 
@@ -23,6 +24,8 @@ def run_cmbs_model():
         senior_coupon = st.slider("Senior Interest Rate (%)", 2.0, 6.0, 4.0)
         mezz_coupon = st.slider("Mezzanine Interest Rate (%)", 5.0, 12.0, 8.0)
         scenario = st.selectbox("Stress Scenario", ["Custom", "Mild", "Moderate", "Severe"])
+
+        reinvest_toggle = st.checkbox("Enable Reinvestment Period (Years 1–3)", value=True)
 
         st.header("Assumptions")
         if scenario == "Custom":
@@ -52,23 +55,24 @@ def run_cmbs_model():
         default_rate,
         loss_severity,
         noi_yield,
-        years
+        years,
+        reinvest_toggle
     )
 
     senior_paid = df["Senior Interest"].sum() + df["Senior Principal"].sum()
     mezz_paid = df["Mezz Interest"].sum() + df["Mezz Principal"].sum()
     principal_paid = df["Senior Principal"].sum() + df["Mezz Principal"].sum()
     equity_paid = df["Equity Cash"].sum()
-    
-    senior_interest_paid=df["Senior Interest"].sum()
-    senior_principal_paid=df["Senior Principal"].sum()
-    mezz_interest_paid=df["Mezzanine Interest"].sum() if "Mezzanine Interest" in df.columns else df["Mezz Interest"].sum()
-    mezz_principal_paid=df["Mezz Principal"].sum()
-    equity_paid=df["Equity Cash"].sum()
 
-    expected_loss=total_loan_pool*(default_rate/100)*(loss_severity/100)
-    net_cash=senior_interest_paid+senior_principal_paid+mezz_interest_paid+mezz_principal_paid+equity_paid
+    senior_interest_paid = df["Senior Interest"].sum()
+    senior_principal_paid = df["Senior Principal"].sum()
+    mezz_interest_paid = df["Mezzanine Interest"].sum() if "Mezzanine Interest" in df.columns else df[
+        "Mezz Interest"].sum()
+    mezz_principal_paid = df["Mezz Principal"].sum()
+    equity_paid = df["Equity Cash"].sum()
 
+    expected_loss = total_loan_pool * (default_rate / 100) * (loss_severity / 100)
+    net_cash = senior_interest_paid + senior_principal_paid + mezz_interest_paid + mezz_principal_paid + equity_paid
 
     def to_millions(value):
         return f"${value / 1_000_000:.2f}M"
@@ -115,18 +119,17 @@ def run_cmbs_model():
 
     st.subheader("Tranche Summary")
 
-    col1,col2,col3=st.columns(3)
+    col1, col2, col3 = st.columns(3)
     with col1:
-        st.metric("Senior Interest",f"${senior_interest_paid/1_000_000:.2f}M")
-        st.metric("Senior Principal",f"${senior_principal_paid/1_000_000:.2f}M")
+        st.metric("Senior Interest", f"${senior_interest_paid / 1_000_000:.2f}M")
+        st.metric("Senior Principal", f"${senior_principal_paid / 1_000_000:.2f}M")
     with col2:
-        st.metric("Mezzanine Interest",f"${mezz_interest_paid/1_000_000:.2f}M")
-        st.metric("Mezzanine Principal",f"${mezz_principal_paid/1_000_000:.2f}M")
+        st.metric("Mezzanine Interest", f"${mezz_interest_paid / 1_000_000:.2f}M")
+        st.metric("Mezzanine Principal", f"${mezz_principal_paid / 1_000_000:.2f}M")
     with col3:
-        st.metric("Equity Residual",f"${equity_paid/1_000_000:.2f}M")
-        st.metric("Expected Loss",f"${expected_loss/1_000_000:.2f}M")
-        st.metric("Net Cash Distributed",f"${net_cash/1_000_000:.2f}M")
-
+        st.metric("Equity Residual", f"${equity_paid / 1_000_000:.2f}M")
+        st.metric("Expected Loss", f"${expected_loss / 1_000_000:.2f}M")
+        st.metric("Net Cash Distributed", f"${net_cash / 1_000_000:.2f}M")
 
     st.subheader("Monthly Cashflows")
     df.rename(columns={"Mezz Interest": "Mezzanine Interest"}, inplace=True)

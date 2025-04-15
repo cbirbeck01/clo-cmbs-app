@@ -87,7 +87,7 @@ def run_cmbs_model():
         ],
         textposition="inside",
         insidetextanchor="middle",
-        insidetextfont=dict(color="white", size=18, family="Helvetica")
+        insidetextfont=dict(color="white", size=18, family="Helvetica"),
         hoverinfo="x+text",
         increasing={"marker": {"color": "#1ab413"}},
         decreasing={"marker": {"color": "#3a9bc0"}},

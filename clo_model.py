@@ -392,19 +392,6 @@ def run_clo_model():
         st.dataframe(df,use_container_width=True)
 
 
-        import io
-
-        output = io.BytesIO()
-        with pd.ExcelWriter(output, engine='openpyxl') as writer:
-            irr_df.to_excel(writer, index=False, sheet_name='IRR Summary')
-            writer.close()
-
-        st.download_button(
-            label="Download IRR Table as Excel",
-            data=output.getvalue(),
-            file_name="clo_tranche_irr_summary.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
 
 
 

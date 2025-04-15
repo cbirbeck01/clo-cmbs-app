@@ -39,10 +39,10 @@ if view=="home":
         st.markdown("""
         <div style="text-align: center; margin-top: 2em;">
             <form action="?view=clo" style="display: inline-block; margin: 10px;">
-                <button class="custom-button">🚀 CLO Waterfall</button>
+                <button class="custom-button">CLO Model</button>
             </form>
             <form action="?view=cmbs" style="display: inline-block; margin: 10px;">
-                <button class="custom-button">🏢 CMBS Model</button>
+                <button class="custom-button">CMBS Model</button>
             </form>
         </div>
         """, unsafe_allow_html=True)

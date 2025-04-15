@@ -3,6 +3,14 @@ import plotly.graph_objects as go
 import numpy_financial as npf
 from cmbs_periodic_cashflow import simulate_cmbs_cashflows
 
+def create_cmbs_annual_cashflow_summary(df, years):
+    df["Year"]=(df["Month"]-1)//12+1
+    summary=df.groupby("Year")[["Senior Interest","Senior Principal","Mezz Interest","Mezz Principal","Equity Cash"]].sum().reset_index()
+    summary["Senior Cash Flow"]=summary["Senior Interest"]+summary["Senior Principal"]
+    summary["Mezzanine Cash Flow"]=summary["Mezz Interest"]+summary["Mezz Principal"]
+    summary["Equity Cash Flow"]=summary["Equity Cash"]
+    summary["Year Label"]=summary["Year"].apply(lambda x:f"Year {x}")
+    return summary[["Year Label","Senior Cash Flow","Mezzanine Cash Flow","Equity Cash Flow"]]
 
 def run_cmbs_model():
 
@@ -154,19 +162,10 @@ def run_cmbs_model():
 
         import pandas as pd
 
-        #Annual cash flow
-        years_list = [f"Year {i}" for i in range(1, years + 1)]
-
-        senior_annual = [to_millions(senior_paid / years)] * years
-        mezz_annual = [to_millions(mezz_paid / years)] * years
-        equity_annual = [to_millions(equity_paid / years)] * years
-
-        cf_table = pd.DataFrame({
-            "Year": years_list,
-            "Senior Cash Flow": senior_annual,
-            "Mezzanine Cash Flow": mezz_annual,
-            "Equity Cash Flow": equity_annual
-        })
+        cf_table = create_cmbs_annual_cashflow_summary(df, years)
+        cf_table["Senior Cash Flow"] = cf_table["Senior Cash Flow"].apply(to_millions)
+        cf_table["Mezzanine Cash Flow"] = cf_table["Mezzanine Cash Flow"].apply(to_millions)
+        cf_table["Equity Cash Flow"] = cf_table["Equity Cash Flow"].apply(to_millions)
 
         st.subheader("Investor Payment Schedule")
         st.dataframe(cf_table, use_container_width=True)

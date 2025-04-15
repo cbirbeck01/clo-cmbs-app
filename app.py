@@ -2,7 +2,7 @@ import streamlit as st
 from clo_model import run_clo_model
 from cmbs_model import run_cmbs_model
 
-
+st.set_page_config(page_title="Asset Backed Securities Visualizer", layout="wide")
 st.markdown("""
 <style>
 div.stButton > button {
@@ -22,7 +22,6 @@ div.stButton > button:hover {
 """, unsafe_allow_html=True)
 
 
-st.set_page_config(page_title="Asset Backed Securities Visualizer", layout="wide")
 
 view = st.query_params.get("view", "home")
 

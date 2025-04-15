@@ -95,6 +95,13 @@ def run_cmbs_model():
         mezz_paid = df["Mezz Interest"].sum() + df["Mezz Principal"].sum()
         principal_paid = df["Senior Principal"].sum() + df["Mezz Principal"].sum()
         equity_paid = df["Equity Cash"].sum()
+        senior_interest_paid=df["Senior Interest"].sum()
+        senior_principal=df["Senior Principal"].sum()
+        mezz_interest_paid=df["Mezz Interest"].sum()
+        mezz_principal=df["Mezz Principal"].sum()
+        equity_paid=df["Equity Cash"].sum()
+    net_cash=senior_interest_paid+senior_principal+mezz_interest_paid+mezz_principal+equity_paid
+
 
         def to_millions(value):
             return f"${value / 1_000_000:.2f}M"
@@ -102,28 +109,26 @@ def run_cmbs_model():
         fig = go.Figure(go.Waterfall(
             name="CMBS Waterfall",
             orientation="v",
-            measure=["absolute", "relative", "relative", "relative", "relative"],
+            measure=["relative","relative","relative","relative"],
             x=[
-                "Net Available Cash",
-                "Senior Interest",
-                "Mezzanine Interest",
-                "Principal",
-                "Equity Residual"
+            "Available Cash",
+            "Senior Tranche",
+            "Mezzanine Tranche",
+            "Equity Tranche"
+            ]
+
+           y=[
+            net_cash,
+            -(senior_interest_paid+senior_principal),
+            -(mezz_interest_paid+mezz_principal),
+            equity_paid if equity_paid>0 else -1_000_000
             ],
-            y=[
-                senior_paid + mezz_paid + principal_paid + equity_paid,
-                -senior_paid,
-                -mezz_paid,
-                -principal_paid,
-                equity_paid
-            ],
-            text = [
-            to_millions(senior_paid + mezz_paid + principal_paid + equity_paid),
-            to_millions(senior_paid),
-            to_millions(mezz_paid),
-            to_millions(principal_paid),
-            to_millions(equity_paid)
-        ],
+           text=[
+                to_millions(net_cash),
+                to_millions(senior_interest_paid+senior_principal),
+                to_millions(mezz_interest_paid+mezz_principal),
+                to_millions(equity_paid)
+                ],
             textposition="inside",
             insidetextanchor="middle",
             hoverinfo="x+text",

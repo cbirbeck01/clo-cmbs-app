@@ -4,6 +4,16 @@ import numpy_financial as npf
 import pandas as pd
 
 
+def create_clo_annual_cashflow_summary(df, years):
+    df["Year"]=(df["Month"]-1)//12+1
+    summary=df.groupby("Year")[["Senior Interest","Senior Principal","Mezz Interest","Mezz Principal","Equity Cash"]].sum().reset_index()
+    summary["Senior Cash Flow"]=summary["Senior Interest"]+summary["Senior Principal"]
+    summary["Mezzanine Cash Flow"]=summary["Mezz Interest"]+summary["Mezz Principal"]
+    summary["Equity Cash Flow"]=summary["Equity Cash"]
+    summary["Year Label"]=summary["Year"].apply(lambda x:f"Year {x}")
+    return summary[["Year Label","Senior Cash Flow","Mezzanine Cash Flow","Equity Cash Flow"]]
+
+
 def run_clo_model():
 
     st.title("CLO Waterfall")
@@ -99,16 +109,28 @@ def run_clo_model():
 
     remaining_cash = available_cash
 
-    senior_paid = min(senior_interest, remaining_cash)
-    remaining_cash -= senior_paid
+    from clo_periodic_cashflow import simulate_clo_cashflows
 
-    mezz_paid = min(mezz_interest, remaining_cash)
-    remaining_cash -= mezz_paid
+    df, sr_irr, mz_irr, eq_irr = simulate_clo_cashflows(
+        total_collateral,
+        senior_size,
+        mezz_size,
+        equity_size,
+        senior_rate,
+        mezz_rate,
+        default_rate,
+        recovery_rate,
+        collateral_yield,
+        years
+    )
 
-    principal_paid = min(principal_repayment, remaining_cash)
-    remaining_cash -= principal_paid
-
-    equity_paid = max(remaining_cash, 0)
+    # Use cumulative results for visuals
+    senior_paid = df["Senior Interest"].sum() + df["Senior Principal"].sum()
+    mezz_paid = df["Mezz Interest"].sum() + df["Mezz Principal"].sum()
+    principal_paid = df["Senior Principal"].sum() + df["Mezz Principal"].sum()
+    equity_paid = df["Equity Cash"].sum()
+    expected_loss = total_collateral * (default_rate / 100) * (1 - recovery_rate / 100)
+    net_cash = senior_paid + mezz_paid + principal_paid + equity_paid
 
     chart_view = st.selectbox("Select Chart View", ["Tranche View", "Waterfall View"], index=0)
 
@@ -200,6 +222,18 @@ def run_clo_model():
             # Render the chart using container width
             st.plotly_chart(fig, use_container_width=True)
 
+            st.subheader("Tranche Summary")
+
+            col1, col2 = st.columns(2)
+            with col1:
+                st.metric("Senior Paid", f"${senior_paid / 1_000_000:.2f}M")
+                st.metric("Mezzanine Paid", f"${mezz_paid / 1_000_000:.2f}M")
+                st.metric("Principal Paid", f"${principal_paid / 1_000_000:.2f}M")
+            with col2:
+                st.metric("Equity Residual", f"${equity_paid / 1_000_000:.2f}M")
+                st.metric("Expected Loss", f"${expected_loss / 1_000_000:.2f}M")
+                st.metric("Net Cash Distributed", f"${net_cash / 1_000_000:.2f}M")
+
             # Close the wrapper
             st.markdown("</div>", unsafe_allow_html=True)
 
@@ -212,15 +246,22 @@ def run_clo_model():
         mezz_irr = npf.irr(mezz_cf) * 100
         equity_irr = npf.irr(equity_cf) * 100
 
-        irr_df = pd.DataFrame({
-            "Tranche": ["Senior", "Mezzanine", "Equity"],
-            "Initial Investment": [senior_size, mezz_size, equity_size],
-            "Total Paid": [senior_paid + senior_size, mezz_paid + mezz_size, equity_paid],
-            "IRR (%)": [f"{senior_irr:.2f}", f"{mezz_irr:.2f}", f"{equity_irr:.2f}"]
-        })
+        st.subheader("Tranche IRRs")
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Senior IRR", f"{sr_irr:.2f}%")
+        col2.metric("Mezzanine IRR", f"{mz_irr:.2f}%")
+        col3.metric("Equity IRR", f"{eq_irr:.2f}%")
 
-        st.subheader("Tranche IRR Summary Table")
-        st.dataframe(irr_df, use_container_width=True)
+        st.subheader("Annual Cash Flow Summary")
+        annual_df = create_clo_annual_cashflow_summary(df, years)
+        for col in ["Senior Cash Flow", "Mezzanine Cash Flow", "Equity Cash Flow"]:
+            annual_df[col] = annual_df[col].apply(lambda x: f"${x / 1_000_000:.2f}M")
+        st.dataframe(annual_df, use_container_width=True)
+
+        st.subheader("Monthly Cashflows")
+        st.dataframe(df, use_container_width=True)
+
+#WATERFALL VIEW:
 
     elif chart_view == "Waterfall View":
         senior_flag = status_flag(senior_paid, senior_interest)
@@ -270,6 +311,8 @@ def run_clo_model():
             + (f" ({(principal_paid / principal_repayment * 100):.1f}%)" if show_percentage else ""),
             f"Equity Residual: ${equity_paid:,.0f} {equity_flag}"
         ]
+
+        
 
         fig = go.Figure(go.Waterfall(
             name="CLO Waterfall",

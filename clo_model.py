@@ -134,7 +134,7 @@ def run_clo_model():
     expected_loss = total_collateral * (default_rate / 100) * (1 - recovery_rate / 100)
     net_cash = senior_paid + mezz_paid + principal_paid + equity_paid
 
-    chart_view = st.selectbox("Select Chart View", ["Tranche View", "Waterfall View"], index=0)
+    chart_view = st.selectbox("Select Chart View", ["Simplified Tranche View", "Simplified Waterfall View"], index=0)
 
     def status_flag(actual, expected):
         if actual >= expected:
@@ -144,7 +144,7 @@ def run_clo_model():
         else:
             return "❌"
 
-    if chart_view == "Tranche View":
+    if chart_view == "Simplified Tranche View":
         tranches = list(reversed([
             {"label": "Senior", "expected": senior_interest, "paid": senior_paid, "color": "rgba(1,31,75,0.7)"},
             {"label": "Mezzanine", "expected": mezz_interest, "paid": mezz_paid, "color": "rgba(0,91,150,0.6)"},
@@ -280,7 +280,7 @@ def run_clo_model():
 
 #WATERFALL VIEW:
 
-    elif chart_view == "Waterfall View":
+    elif chart_view == "Simplified Waterfall View":
         senior_flag = status_flag(senior_paid, senior_interest)
         mezz_flag = status_flag(mezz_paid, mezz_interest)
         principal_flag = status_flag(principal_paid, principal_repayment)

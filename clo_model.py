@@ -270,36 +270,34 @@ def run_clo_model():
         equity_flag = status_flag(equity_paid, 0.01)
 
         x_labels = [
-            "Available Cash",
-            "Senior Interest<br>" + senior_flag,
-            "Mezzanine Interest<br>" + mezz_flag,
-            "Principal<br>" + principal_flag,
-            "Equity<br>" + equity_flag
+        "Available Cash",
+        "Senior",
+        "Mezzanine",
+        "Equity"
         ]
+
 
         y_values = [
-            available_cash,
-            -senior_paid,
-            -mezz_paid,
-            -principal_paid,
-            -equity_paid if equity_paid > 0 else -1_000_000  # force visible
+        available_cash,
+        -senior_paid,
+        -mezz_paid,
+        equity_paid if equity_paid > 0 else -1_000_000
         ]
 
-        measure = ["relative", "relative", "relative", "relative", "relative"]
+
+        measure = ["relative","relative","relative","relative"]
         show_percentage = st.checkbox("Show Percent of Expected Payout", value=False)
 
         def format_millions(value):
             return f"{value / 1_000_000:.1f}M"
 
         text_labels = [
-            format_millions(available_cash),
-            format_millions(senior_paid) + (
-                f" ({(senior_paid / senior_interest * 100):.1f}%)" if show_percentage else ""),
-            format_millions(mezz_paid) + (f" ({(mezz_paid / mezz_interest * 100):.1f}%)" if show_percentage else ""),
-            format_millions(principal_paid) + (
-                f" ({(principal_paid / principal_repayment * 100):.1f}%)" if show_percentage else ""),
-            format_millions(equity_paid)
+        format_millions(available_cash),
+        format_millions(senior_paid),
+        format_millions(mezz_paid),
+        format_millions(equity_paid)
         ]
+
 
         hover_text = [
             f"Available Cash: ${available_cash:,.0f}",

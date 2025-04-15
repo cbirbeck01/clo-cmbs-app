@@ -27,6 +27,30 @@ view = st.query_params.get("view", "home")
 
 if view=="home":
 
+
+
+    with st.container():
+        st.markdown("<div style='height:25vh;'></div>", unsafe_allow_html=True)
+
+        st.markdown("<h1 style='text-align: center;'>Asset Backed Securities Visualizer</h1>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center; font-size: 1.2em;'>Select a product type to begin:</p>", unsafe_allow_html=True)
+
+
+        spacer1, center_col, spacer2 = st.columns([1, 2, 1])
+        with center_col:
+            col1, col2 = st.columns(2)
+
+            with col1:
+                if st.button("CLO"):
+                    st.query_params["view"]="clo"
+                    st.rerun()
+
+            with col2:
+                if st.button("CMBS"):
+                    st.query_params["view"]="cmbs"
+                    st.rerun()
+
+
 elif view=="clo":
     run_clo_model()
 
@@ -35,25 +59,3 @@ elif view=="cmbs":
 
 else:
     st.error("Invalid view.")
-
-
-    with st.container():
-        st.markdown("<div style='height:25vh;'></div>", unsafe_allow_html=True)
-        # Centered heading
-        st.markdown("<h1 style='text-align: center;'>Asset Backed Securities Visualizer</h1>", unsafe_allow_html=True)
-        st.markdown("<p style='text-align: center; font-size: 1.2em;'>Select a product type to begin:</p>", unsafe_allow_html=True)
-
-        # Centered buttons using inline-block layout
-        st.markdown("""
-        <div style="text-align: center; margin-top: 2em;">
-            <form action="?view=clo" style="display: inline-block; margin: 10px;">
-                <button class="custom-button">CLO Model</button>
-            </form>
-            <form action="?view=cmbs" style="display: inline-block; margin: 10px;">
-                <button class="custom-button">CMBS Model</button>
-            </form>
-        </div>
-        """, unsafe_allow_html=True)
-
-
-

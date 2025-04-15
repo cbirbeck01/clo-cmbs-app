@@ -55,6 +55,11 @@ def run_cmbs_model():
         years
     )
 
+    senior_paid = df["Senior Interest"].sum() + df["Senior Principal"].sum()
+    mezz_paid = df["Mezz Interest"].sum() + df["Mezz Principal"].sum()
+    principal_paid = df["Senior Principal"].sum() + df["Mezz Principal"].sum()
+    equity_paid = df["Equity Cash"].sum()
+    
     senior_interest_paid=df["Senior Interest"].sum()
     senior_principal_paid=df["Senior Principal"].sum()
     mezz_interest_paid=df["Mezzanine Interest"].sum() if "Mezzanine Interest" in df.columns else df["Mezz Interest"].sum()

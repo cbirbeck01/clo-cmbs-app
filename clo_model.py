@@ -325,8 +325,6 @@ def run_clo_model():
             + (f" ({(senior_paid / senior_interest * 100):.1f}%)" if show_percentage else ""),
             f"Mezzanine Interest: ${mezz_paid:,.0f} of ${mezz_interest:,.0f} {mezz_flag}"
             + (f" ({(mezz_paid / mezz_interest * 100):.1f}%)" if show_percentage else ""),
-            f"Principal: ${principal_paid:,.0f} of ${principal_repayment:,.0f} {principal_flag}"
-            + (f" ({(principal_paid / principal_repayment * 100):.1f}%)" if show_percentage else ""),
             f"Equity Residual: ${equity_paid:,.0f} {equity_flag}"
         ]
 

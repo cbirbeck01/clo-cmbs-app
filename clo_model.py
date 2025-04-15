@@ -337,11 +337,11 @@ def run_clo_model():
             title="CLO Tranche Waterfall Distribution",
             showlegend=False,
             xaxis=dict(
-                title=dict(text="Tranche", font=dict(color="black", size=14)),
+                title=dict(text="Cash Flow Step", font=dict(color="black", size=14)),
                 tickfont=dict(color="black")
             ),
             yaxis=dict(
-                title=dict(text="Cash Flow ($)", font=dict(color="black", size=14)),
+                title=dict(text="Amount ($)", font=dict(color="black", size=14)),
                 tickfont=dict(color="black"),
                 range=[-available_cash * 1.05, available_cash * 1.05]
             ),

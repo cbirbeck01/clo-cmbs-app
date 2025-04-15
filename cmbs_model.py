@@ -85,10 +85,10 @@ def run_cmbs_model():
         textposition="inside",
         insidetextanchor="middle",
         hoverinfo="x+text",
-        increasing={"marker": {"color": "#2d6cd2"}},
-        decreasing={"marker": {"color": "#cc0000"}},
+        increasing={"marker": {"color": "#1ab413"}},
+        decreasing={"marker": {"color": "#3a9bc0"}},
         totals={"marker": {"color": "#27a119"}},
-        opacity=0.85
+        opacity=0.70
     ))
 
     fig.update_layout(

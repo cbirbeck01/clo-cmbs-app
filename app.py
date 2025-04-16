@@ -1,6 +1,6 @@
 import streamlit as st
 from clo_model import run_clo_model
-from cmbs_model import run_cmbs_model
+
 
 
 st.set_page_config(page_title="Asset Backed Securities Visualizer", layout="wide")
@@ -31,23 +31,17 @@ if view == "home":
     st.title("Asset Backed Securities Visualizer")
     st.markdown("### Select a product type to begin:")
 
-    col1, col2 = st.columns(2)
+    col1= st.columns(1)
 
     with col1:
         if st.button("CLO Model"):
             st.query_params["view"] = "clo"
             st.rerun()
 
-    with col2:
-        if st.button("CMBS Model"):
-            st.query_params["view"] = "cmbs"
-            st.rerun()
 
 elif view == "clo":
     run_clo_model()
 
-elif view == "cmbs":
-    run_cmbs_model()
 
 else:
     st.error("Invalid view.")
